@@ -31,12 +31,15 @@ async def send_response(message: Message, user_message: str) -> None:
         await message.channel.send(f"An error occurred: {e}")
 
 @bot.hybrid_command()
+@commands.has_permissions(administrator=True)
 async def sync(ctx: commands.Context) -> None:
     """
     Sync the commands with the Discord API.
     
     :param ctx: The context of the command.
     """
+
+    await ctx.defer()
     
     try:
         synced = await bot.tree.sync()
