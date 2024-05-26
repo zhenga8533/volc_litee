@@ -48,6 +48,7 @@ async def sync(ctx: commands.Context) -> None:
         await ctx.send(f'An error occurred: {e}')
 
 @bot.hybrid_command()
+@commands.has_permissions(administrator=True)
 async def ping(ctx: commands.Context) -> None:
     """
     Respond to a ping command.
@@ -55,8 +56,8 @@ async def ping(ctx: commands.Context) -> None:
     :param ctx: The context of the command.
     """
     
-    res: str = ping_command()
-    await ctx.send(res)
+    latency: str = round(bot.latency * 1_000)
+    await ctx.send(f'Pong! Took {latency}ms.')
 
 @bot.hybrid_command()
 async def w(ctx: commands.Context) -> None:
