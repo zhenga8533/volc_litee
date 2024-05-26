@@ -6,10 +6,10 @@ def get_response(user_input: str) -> str:
     :return: The response to the user's input.
     """
 
-    if user_input == "hi":
-        return "Hello!"
-    elif user_input == "bye":
-        return "Goodbye!"
-    else:
-        return "I don't understand that!"
+    if user_input == 'hi':
+        return 'Hello!'
+    elif user_input == 'bye':
+        return 'Goodbye!'
+    elif user_input == 'test':
+        return 'Test successful!'
     
