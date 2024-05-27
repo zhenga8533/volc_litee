@@ -1,11 +1,12 @@
-from party_classes.coinflip import Coin
-from party_classes.rps import RockPaperScissorsView
+from cogs.party_classes.coinflip import Coin
+from cogs.party_classes.rps import RockPaperScissorsView
 from discord.ext import commands
 from discord.ext.commands import Context
 from discord import app_commands, Color, Embed
 import discord
 import random
 import requests
+
 
 SFW_TAGS = [
     'waifu', 'neko', 'shinobu', 'megumin', 'cuddle', 'cry', 'hug', 'kiss', 'lick', 'pat', 'smug', 'bonk', 'blush', 
