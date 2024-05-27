@@ -1,3 +1,4 @@
+from cogs.utils.format import send_embed
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
 import discord
@@ -35,27 +36,69 @@ class Bazaar(commands.Cog, name='bazaar'):
         """
 
         self.bot = bot
-
+    
     @commands.hybrid_command(
-        name='copper',
-        description='This is a testing command that does nothing.',
+        name='gabagool',
+        description='This command will calculate the profit of using Heavy Gabagool.',
     )
-    async def copper(self, context: Context) -> None:
+    async def gabagool(self, context: Context, tier: int = 5, count: int = 31) -> None:
         """
-        This is a testing command that does nothing.
-
+        This command will calculate the profit of using Heavy Gabagool.
+        
         :param context: The application command context.
+        :param tier: Level of the minions (1-11). Default is 5.
+        :param count: Number of minions. Default is 31.
         """
 
-        pass
+        # Constants
+        INFERNO_ACTION_UPGRADE = 34.5
+        INFERNO_ACTION_BASE = 1136.5
+        MAX_INFERNO = 3.41
+        ACTION_15 = 1.1 * (INFERNO_ACTION_BASE - (tier * INFERNO_ACTION_UPGRADE)) / MAX_INFERNO / 16
+        bz = bazaar.get_data()
+
+        # Calculate the profit
+        gabagool = int(count * 86_400 / (2 * ACTION_15) * bz['CRUDE_GABAGOOL'][1])
+        price = int(count * (
+            bz['HEAVY_GABAGOOL'][0] +
+            6 * bz['CRUDE_GABAGOOL_DISTILLATE'][0] +
+            2 * bz['INFERNO_FUEL_BLOCK'][0]
+        ))
+        profit = gabagool - price
+
+        # Create the embed
+        embed = discord.Embed(
+            title=f'Heavy Gabagool {count}x T{tier}  <:heavy_gabagool:1244700225705345074>',
+            description='Please note that these calculations are done with max upgrades!',
+            color=discord.Color.green() if profit > 0 else discord.Color.red()
+        )
+
+        # Add the fields to the embed
+        embed.add_field(
+            name='Profit',
+            value=f'{gabagool:,}',
+            inline=True
+        )
+        embed.add_field(
+            name='Price',
+            value=f'{price:,}',
+            inline=True
+        )
+        embed.add_field(
+            name='Total',
+            value=f'{profit:,}',
+            inline=True
+        )
+        
+        send_embed(context, embed)
 
     @commands.hybrid_command(
         name='spaceman',
-        description='This is a testing command that does nothing.',
+        description='This command will display the current prices for the spaceman crops.',
     )
     async def spaceman(self, context: Context) -> None:
         """
-        This is a testing command that does nothing.
+        This command will display the current prices for the spaceman crops.
 
         :param context: The application command context.
         """
@@ -147,12 +190,7 @@ class Bazaar(commands.Cog, name='bazaar'):
             inline=True
         )
 
-        embed.set_footer(
-            icon_url='https://mc-heads.net/avatar/Volcaronitee/100/nohelm.png',
-            text='Made by Volcaronitee!'
-        )
-
-        await context.send(embed=embed)
+        await send_embed(context, embed)
 
 
 async def setup(bot) -> None:
