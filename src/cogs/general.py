@@ -80,11 +80,17 @@ class General(commands.Cog, name="general"):
             title="Help", description="List of available commands:", color=0xBEBEFE
         )
         for i in self.bot.cogs:
+            # Skip the cog if the user is not the owner and the cog is owner-only
             if i == "owner" and not (await self.bot.is_owner(context.author)):
                 continue
+            if i == "moderation" and not context.author.guild_permissions.manage_messages:
+                continue
+
+            # Get the cog and its commands
             cog = self.bot.get_cog(i.lower())
             commands = cog.get_commands()
             data = []
+            
             for command in commands:
                 description = command.description.partition("\n")[0]
                 data.append(f"{prefix}{command.name} - {description}")
