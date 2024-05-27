@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -9,6 +8,12 @@ from discord.ext.commands import Context
 
 class Moderation(commands.Cog, name="moderation"):
     def __init__(self, bot) -> None:
+        """
+        Initializes the Moderation cog.
+
+        :param bot: The instance of the bot that the cog is being added to.
+        """
+
         self.bot = bot
 
     @commands.hybrid_command(

@@ -6,6 +6,12 @@ from discord.ext.commands import Context
 
 class Owner(commands.Cog, name="owner"):
     def __init__(self, bot) -> None:
+        """
+        Initializes the Owner cog.
+
+        :param bot: The instance of the bot that the cog is being added to.
+        """
+
         self.bot = bot
 
     @commands.command(
