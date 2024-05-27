@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.ext.commands import Context
 import discord
 import requests
@@ -7,17 +7,23 @@ import requests
 class BazaarData():
     def __init__(self):
         self.data = {}
-        self.fetch_data()
-    
-    def fetch_data(self):
+        self.fetch_data.start()
+
+    def fetch_data_once(self):
+        print("Fetching data from the API")
         response = requests.get("https://volcaronitee.pythonanywhere.com/bazaar")
         if response.status_code == 200:
             self.data = response.json()
         else:
             print("Failed to fetch data from the API")
 
+    @tasks.loop(hours=1)
+    async def fetch_data(self):
+        self.fetch_data_once()
+
     def get_data(self):
         return self.data
+
 bazaar = BazaarData()
 
 
@@ -30,6 +36,7 @@ class Bazaar(commands.Cog, name="bazaar"):
         """
 
         self.bot = bot
+        self.bazaar_data = BazaarData(bot)
 
     @commands.hybrid_command(
         name="copper",
