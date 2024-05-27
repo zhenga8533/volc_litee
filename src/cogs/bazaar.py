@@ -26,6 +26,19 @@ class Bazaar(commands.Cog, name="bazaar"):
 
         pass
 
+    @commands.hybrid_command(
+        name="spaceman",
+        description="This is a testing command that does nothing.",
+    )
+    async def spaceman(self, context: Context) -> None:
+        """
+        This is a testing command that does nothing.
+
+        :param context: The application command context.
+        """
+
+        pass
+
 
 async def setup(bot) -> None:
     """
