@@ -5,6 +5,11 @@ import discord
 import requests
 
 
+INFERNO_ACTION_UPGRADE = 34.5
+INFERNO_ACTION_BASE = 1136.5
+MAX_INFERNO = 3.41
+
+
 class BazaarData():
     def __init__(self):
         self.data = {}
@@ -39,7 +44,7 @@ class Bazaar(commands.Cog, name='bazaar'):
     
     @commands.hybrid_command(
         name='gabagool',
-        description='This command will calculate the profit of using Heavy Gabagool.',
+        description='This command will calculate the profit of using Heavy Fuel.',
     )
     async def gabagool(self, context: Context, tier: int = 5, count: int = 31) -> None:
         """
@@ -51,9 +56,6 @@ class Bazaar(commands.Cog, name='bazaar'):
         """
 
         # Constants
-        INFERNO_ACTION_UPGRADE = 34.5
-        INFERNO_ACTION_BASE = 1136.5
-        MAX_INFERNO = 3.41
         ACTION_15 = 1.1 * (INFERNO_ACTION_BASE - (tier * INFERNO_ACTION_UPGRADE)) / MAX_INFERNO / 16
         bz = bazaar.get_data()
 
@@ -91,6 +93,96 @@ class Bazaar(commands.Cog, name='bazaar'):
         )
         
         send_embed(context, embed)
+
+    @commands.hybrid_command(
+        name='hypergolic',
+        description='This command will calculate the profit of crafting Hypergolic Fuel.',
+    )
+    async def hypergolic(self, context: Context, tier: int = 5, count: int = 31) -> None:
+        """
+        This command will calculate the profit of using Hypergolic Fuel.
+        
+        :param context: The application command context.
+        :param tier: Level of the minions (1-11). Default is 5.
+        :param count: Number of minions. Default is 31.
+        """
+
+        # Constants
+        bz = bazaar.get_data()
+        
+        price = (1202 * bz.get('ENCHANTED_COAL', [0, 0])[0] + \
+            75.125 * bz.get('ENCHANTED_SULPHUR', [0, 0])[0] + \
+            6912 * bz.get('CRUDE_GABAGOOL', [0, 0])[0]) * count
+    
+    @commands.command(
+        name='inferno',
+        description='This command will calculate the profit of using Inferno Fuel.',
+    )
+    async def inferno(self, context: Context, tier: int = 5, count: int = 31) -> None:
+        EYEDROP = 1.3
+        ACTION_20 = 1.1 * (INFERNO_ACTION_BASE - (tier * INFERNO_ACTION_UPGRADE)) / MAX_INFERNO / 21
+        ACTIONS = count * 86400 / (2 * ACTION_20)
+        bz = bazaar.get_data()
+
+        # Calculate the drops
+        drops = {
+            'GABAGOOL': ACTIONS,
+            'CHILI': ACTIONS / (156 / EYEDROP) * 1.15,
+            'VERTEX': round(ACTIONS / (16364 / EYEDROP) * 2.8, 2),
+            'APEX': round(ACTIONS / (1570909 / EYEDROP) * 1.2 * (2 if tier >= 10 else 1), 2),
+            'REAPER': round(ACTIONS / (458182 / EYEDROP), 2)
+        }
+
+        # Calculate the profit
+        profit = {
+            'GABAGOOL': int(drops['GABAGOOL'] * bz.get('CRUDE_GABAGOOL', [0, 0])[1]),
+            'CHILI': int(drops['CHILI'] * bz.get('CHILI_PEPPER', [0, 0])[1]),
+            'VERTEX': int(drops['VERTEX'] * bz.get('INFERNO_VERTEX', [0, 0])[1]),
+            'APEX': int(drops['APEX'] * bz.get('INFERNO_APEX', [0, 0])[1]),
+            'REAPER': int(drops['REAPER'] * bz.get('REAPER_PEPPER', [0, 0])[1])
+        }
+
+        # Calculate the fuel cost
+        fuel = count * (
+            bz.get('HYPERGOLIC_GABAGOOL', [0, 0])[1] +
+            6 * bz.get('CRUDE_GABAGOOL_DISTILLATE', [0, 0])[1] +
+            2 * bz.get('INFERNO_FUEL_BLOCK', [0, 0])[1] +
+            bz.get('CAPSAICIN_EYEDROPS_NO_CHARGES', [0, 0])[1]
+        )
+
+        # Calculate the net profit
+        net = sum(profit.values()) - fuel
+
+        # Create the embed
+        embed = discord.Embed(
+            title=f'{count}x T{tier}', 
+            description='These calculations are done with max upgrades!',
+            color=discord.Color.green() if net > 0 else discord.Color.red()
+        )
+        embed.add_field(
+            name=f"<:crude_gabagool:1244712977152868462> Crude Gabagool", 
+            value=f"[{round(drops['GABAGOOL'], 2):,}]: {profit['GABAGOOL']:,}", inline=False
+        )
+        embed.add_field(
+            name=f"<:chili_pepper:1244712282425000028> Chili Pepper", 
+            value=f"[{round(drops['CHILI'], 2):,}]: {profit['CHILI']:,}", inline=False
+        )
+        embed.add_field(
+            name=f"<:inferno_vertex:1244712281477222450> Inferno Vertex", 
+            value=f"[{round(drops['VERTEX'], 2):,}]: {profit['VERTEX']:,}", inline=False
+        )
+        embed.add_field(
+            name=f"<:inferno_apex:1244712280415797288> Inferno Apex", 
+            value=f"[{round(drops['APEX'], 2):,}]: {profit['APEX']:,}", inline=False
+        )
+        embed.add_field(
+            name=f"<:reaper_pepper:1244712279543644160> Reaper Pepper", 
+            value=f"[{round(drops['REAPER'], 2):,}]: {profit['REAPER']:,}", inline=False
+        )
+        embed.add_field(name=f"Fuel Price", value=f"-{int(fuel):,}", inline=True)
+        embed.add_field(name=f"Total Profit", value=f"{int(net):,}", inline=True)
+
+        await send_embed(context, embed)
 
     @commands.hybrid_command(
         name='spaceman',
