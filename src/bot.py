@@ -203,7 +203,9 @@ class DiscordBot(commands.Bot):
         :param error: The error that has been faced.
         """
 
-        if isinstance(error, commands.CommandOnCooldown):
+        if isinstance(error, commands.CommandNotFound):
+            return
+        elif isinstance(error, commands.CommandOnCooldown):
             minutes, seconds = divmod(error.retry_after, 60)
             hours, minutes = divmod(minutes, 60)
             hours = hours % 24
