@@ -1,5 +1,5 @@
-from cogs.party.coinflip import Coin
-from cogs.party.rps import RockPaperScissorsView
+from cogs.party_util.coinflip import Coin
+from cogs.party_util.rps import RockPaperScissorsView
 from discord.ext import commands
 from discord.ext.commands import Context
 from discord import app_commands, Color, Embed
@@ -8,6 +8,7 @@ import random
 import requests
 
 
+# Tags for the waifu.pics API
 SFW_TAGS = [
     'waifu', 'neko', 'shinobu', 'megumin', 'cuddle', 'cry', 'hug', 'kiss', 'lick', 'pat', 'smug', 'bonk', 'blush', 
     'smile', 'wave', 'highfive', 'handhold', 'bite', 'slap', 'kick', 'happy', 'wink', 'poke', 'dance', 'cringe'
