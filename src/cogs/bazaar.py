@@ -1,6 +1,24 @@
 from discord.ext import commands
 from discord.ext.commands import Context
 import discord
+import requests
+
+
+class BazaarData():
+    def __init__(self):
+        self.data = {}
+        self.fetch_data()
+    
+    def fetch_data(self):
+        response = requests.get("https://volcaronitee.pythonanywhere.com/bazaar")
+        if response.status_code == 200:
+            self.data = response.json()
+        else:
+            print("Failed to fetch data from the API")
+
+    def get_data(self):
+        return self.data
+bazaar = BazaarData()
 
 
 class Bazaar(commands.Cog, name="bazaar"):
