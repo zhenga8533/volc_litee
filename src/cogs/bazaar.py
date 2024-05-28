@@ -92,7 +92,7 @@ class Bazaar(commands.Cog, name='bazaar'):
             inline=True
         )
         
-        send_embed(context, embed)
+        await send_embed(context, embed)
 
     @commands.hybrid_command(
         name='hypergolic',
