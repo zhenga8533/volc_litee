@@ -107,12 +107,44 @@ class Bazaar(commands.Cog, name='bazaar'):
         :param count: Number of minions. Default is 31.
         """
 
-        # Constants
         bz = bazaar.get_data()
-        
-        price = (1202 * bz.get('ENCHANTED_COAL', [0, 0])[0] + \
-            75.125 * bz.get('ENCHANTED_SULPHUR', [0, 0])[0] + \
-            6912 * bz.get('CRUDE_GABAGOOL', [0, 0])[0]) * count
+
+        def calc_hypergolic(insta: int) -> int:
+            """
+            Calculate the cost of crafting Hypergolic Fuel.
+            
+            :param insta: The price type (0 = sell offer, 1 = insta buy).
+            :return: The cost of crafting Hypergolic Fuel.
+            """
+
+            return int(1202 * bz.get('ENCHANTED_COAL', [0, 0])[insta] + \
+                75.125 * bz.get('ENCHANTED_SULPHUR', [0, 0])[insta] + \
+                6912 * bz.get('CRUDE_GABAGOOL', [0, 0])[insta]) * count
+
+        # Calculate the profit
+        hypergolic = bz.get('HYPERGOLIC_GABAGOOL', [0, 0])
+        order_hypergolic = calc_hypergolic(0)
+        insta_hypergolic = calc_hypergolic(1)
+        p1 = int(hypergolic[0] - order_hypergolic)
+        p2 = int(hypergolic[0] - insta_hypergolic)
+        p3 = int(hypergolic[1] - order_hypergolic)
+        p4 = int(hypergolic[1] - insta_hypergolic)
+
+        # Create the embed
+        embed = discord.Embed(title="Hypergolic Craft Profits:", color=0x00ff00)
+        embed.add_field(name="<:hypergolic_gabagool:1245169162700066826>  Hypergolic Gabagool:", value="", inline=False)
+        embed.add_field(name="Insta Sell:", value=f"{int(hypergolic[0]):,}", inline=True)
+        embed.add_field(name="Sell Offer:", value=f"{int(hypergolic[1]):,}", inline=True)
+        embed.add_field(name="<:crude_gabagool:1244712977152868462>  Material Cost:", value="", inline=False)
+        embed.add_field(name="Buy Order:", value=f"{order_hypergolic:,}", inline=True)
+        embed.add_field(name="Insta Buy:", value=f"{insta_hypergolic:,}", inline=True)
+        embed.add_field(name="<:inferno_fuel:1244712278025044010>  Total Profit:", value="", inline=False)
+        embed.add_field(name="Insta Sell + Buy Order:", value=f"{p1:,}", inline=False)
+        embed.add_field(name="Insta Sell + Insta Buy:", value=f"{p2:,}", inline=False)
+        embed.add_field(name="Sell Offer + Buy Order:", value=f"{p3:,}", inline=False)
+        embed.add_field(name="Sell Offer + Insta Buy:", value=f"{p4:,}", inline=False)
+
+        await context.send(embed=embed)
     
     @commands.command(
         name='inferno',
