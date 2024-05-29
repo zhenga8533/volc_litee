@@ -119,6 +119,14 @@ class Bazaar(commands.Cog, name='bazaar'):
         description='This command will calculate the profit of using Inferno Fuel.',
     )
     async def inferno(self, context: Context, tier: int = 5, count: int = 31) -> None:
+        """
+        This command will calculate the profit of using Inferno Fuel.
+
+        :param context: The application command context.
+        :param tier: Level of the minions (1-11). Default is 5.
+        :param count: Number of minions. Default is 31.
+        """
+
         EYEDROP = 1.3
         ACTION_20 = 1.1 * (INFERNO_ACTION_BASE - (tier * INFERNO_ACTION_UPGRADE)) / MAX_INFERNO / 21
         ACTIONS = count * 86400 / (2 * ACTION_20)
@@ -155,8 +163,8 @@ class Bazaar(commands.Cog, name='bazaar'):
 
         # Create the embed
         embed = discord.Embed(
-            title=f'{count}x T{tier}', 
-            description='These calculations are done with max upgrades!',
+            title=f'Inferno Minions {count}x T{tier}', 
+            description='Please note that these calculations are done with max upgrades!',
             color=discord.Color.green() if net > 0 else discord.Color.red()
         )
         embed.add_field(
