@@ -43,6 +43,144 @@ class Bazaar(commands.Cog, name='bazaar'):
         self.bot = bot
     
     @commands.hybrid_command(
+        name='farming',
+        description='This command will calculate the profit of farming crops.',
+    )
+    async def farming(self, context: Context, fortune: float = 0.0) -> None:
+        """
+        This command will calculate the profit of farming crops.
+        
+        :param context: The application command context.
+        :param fortune: The fortune level of the crops.
+        """
+
+        bz = bazaar.get_data()
+
+        # Crops that we want to check the prices for. Source: https://hypixel-skyblock.fandom.com/wiki/Farming_Fortune
+        CROPS = {
+            'TIGHTLY_TIED_HAY_BALE': {
+                'craft': 186_624,
+                'drops': 1,
+                'fortune': 1_997,
+                'name': '<:sb_wheat:1245892472471552072> Wheat',
+                'npc': 6
+            },
+            'ENCHANTED_CARROT': {
+                'craft': 160,
+                'drops': 3.5,
+                'fortune': 2_009,
+                'name': '<:sb_carrot:1245892494907019367> Carrot',
+                'npc': 3
+            },
+            'ENCHANTED_BAKED_POTATO': {
+                'craft': 25_600,
+                'drops': 3.5,
+                'fortune': 1_997,
+                'name': '<:sb_potato:1245892937020080138> Potato',
+                'npc': 3
+            },
+            'POLISHED_PUMPKIN': {
+                'craft': 25_600,
+                'drops': 1,
+                'fortune': 1_792,
+                'name': '<:sb_pumpkin:1245893176154259528> Pumpkin',
+                'npc': 10
+            },
+            'ENCHANTED_MELON_BLOCK': {
+                'craft': 25_600,
+                'drops': 5,
+                'fortune': 1_780,
+                'name': '<:sb_melon:1245893198685929472> Melon',
+                'npc': 2
+            },
+            'ENCHANTED_HUGE_MUSHROOM_1': {
+                'craft': 5_120,
+                'drops': 1,
+                'fortune': 1_869,
+                'name': '<:sb_red_mushroom:1245893226767061022> R. Mushroom',
+                'npc': 10
+            },
+            'ENCHANTED_HUGE_MUSHROOM_2': {
+                'craft': 5_120,
+                'drops': 1,
+                'fortune': 1_869,
+                'name': '<:sb_brown_mushroom:1245893247818272831> B. Mushroom',
+                'npc': 10
+            },
+            'ENCHANTED_SUGAR_CANE': {
+                'craft': 25_600,
+                'drops': 2,
+                'fortune': 1_997,
+                'name': '<:sb_sugar_cane:1245893274527334431> Sugar Cane',
+                'npc': 4
+            },
+            'MUTANT_NETHER_STALK': {
+                'craft': 25_600,
+                'drops': 3,
+                'fortune': 1_997,
+                'name': '<:sb_nether_wart:1245893288507215972> Nether Wart',
+                'npc': 4
+            },
+            'ENCHANTED_COCOA': {
+                'craft': 160,
+                'drops': 3,
+                'fortune': 1_800,
+                'name': '<:sb_cocoa_beans:1245893316294213652> Cocoa Bean',
+                'npc': 3
+            },
+            'ENCHANTED_CACTUS': {
+                'craft': 25_600,
+                'drops': 2,
+                'fortune': 1_684,
+                'name': '<:sb_cactus:1245893338746589305> Cactus',
+                'npc': 3
+            }
+        }
+        BPH = 72_000
+
+        # Create the embed.
+        embed = discord.Embed(
+            title='Farming Profits',
+            description='These are the current prices for the farming crops.',
+            color=discord.Color.green()
+        )
+
+        # Add the fields to the embed.
+        for crop_id in CROPS.keys():
+            craft, drops, fortune, name, npc = CROPS[crop_id].values()
+
+            # Calculate the profits
+            insta, order = bz.get(crop_id, [0, 0])
+            rate = BPH * drops * fortune / 100
+            npc_calc = int(npc * rate)
+            order_calc = int(order / craft * rate)
+            insta_calc = int(insta / craft * rate)
+
+            # Calc seeds if wheat
+            if crop_id == 'TIGHTLY_TIED_HAY_BALE':
+                seed_isnta, seed_order = bz.get('BOX_OF_SEEDS', [0, 0])
+                seed_rate = BPH * 1.5 * fortune / 100
+                npc_calc += int(3 * seed_rate)
+                order_calc += int(seed_order / 25_600 * seed_rate)
+                insta_calc += int(seed_isnta / 25_600 * seed_rate)
+
+            # Add the field to the embed
+            embed.add_field(
+                name=name,
+                value=f'NPC: {npc_calc:,}\nOrder: {order_calc:,}\nInstant: {insta_calc:,}',
+                inline=True
+            )
+        
+        # Add best crop and send the embed
+        embed.add_field(
+            name='Best Crop',
+            value=f'Placeholder',
+            inline=True
+        )
+        
+        await send_embed(context, embed)
+    
+    @commands.hybrid_command(
         name='gabagool',
         description='This command will calculate the profit of using Heavy Fuel.',
     )
