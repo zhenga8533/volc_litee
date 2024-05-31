@@ -97,14 +97,14 @@ class Bazaar(commands.Cog, name='bazaar'):
                 'craft': 5_120,
                 'drops': 1,
                 'fortune': 1_869,
-                'name': '<:sb_red_mushroom:1245893226767061022> R. Mushroom',
+                'name': '<:sb_red_mushroom:1245893226767061022> Mushroom',
                 'npc': 10
             },
             'ENCHANTED_HUGE_MUSHROOM_2': {
                 'craft': 5_120,
                 'drops': 1,
                 'fortune': 1_869,
-                'name': '<:sb_brown_mushroom:1245893247818272831> B. Mushroom',
+                'name': '<:sb_brown_mushroom:1245893247818272831> Mushroom',
                 'npc': 10
             },
             'ENCHANTED_SUGAR_CANE': {
@@ -145,6 +145,11 @@ class Bazaar(commands.Cog, name='bazaar'):
             color=discord.Color.green()
         )
 
+        # Track best crop
+        best_crop = 'MUTANT_NETHER_STALK'
+        best_profit = 17_254_080
+        best_value = ''
+
         # Add the fields to the embed.
         for crop_id in CROPS.keys():
             craft, drops, fortune, name, npc = CROPS[crop_id].values()
@@ -165,16 +170,23 @@ class Bazaar(commands.Cog, name='bazaar'):
                 insta_calc += int(seed_isnta / 25_600 * seed_rate)
 
             # Add the field to the embed
+            value_msg = f'NPC: {npc_calc:,}\nOrder: {order_calc:,}\nInstant: {insta_calc:,}'
             embed.add_field(
                 name=name,
-                value=f'NPC: {npc_calc:,}\nOrder: {order_calc:,}\nInstant: {insta_calc:,}',
+                value=value_msg,
                 inline=True
             )
+            
+            # Track best crop
+            if insta_calc > best_profit or order_calc > best_profit or npc_calc == best_profit:
+                best_crop = name
+                best_profit = max(insta_calc, order_calc)
+                best_value = value_msg
         
         # Add best crop and send the embed
         embed.add_field(
-            name='Best Crop',
-            value=f'Placeholder',
+            name=f'{best_crop} [Best]',
+            value=best_value,
             inline=True
         )
         
