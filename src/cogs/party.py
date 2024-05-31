@@ -1,5 +1,6 @@
 from cogs.party_util.coinflip import Coin
 from cogs.party_util.rps import RockPaperScissorsView
+from cogs.utils.format import send_embed
 from discord.ext import commands
 from discord.ext.commands import Context
 from discord import app_commands, Color, Embed
@@ -142,7 +143,8 @@ class Party(commands.Cog, name='party'):
             return
 
         # Check if the channel is NSFW
-        if sfw == 'nsfw' and not context.channel.is_nsfw():
+        nsfw = sfw == 'nsfw'
+        if nsfw and not context.channel.is_nsfw():
                 embed = Embed(
                     title="NSFW Content",
                     description="Cannot send NSFW content in a non-NSFW channel.",
@@ -156,6 +158,12 @@ class Party(commands.Cog, name='party'):
         if response.status_code == 200:
             data = response.json()
             image_url = data['url']
+
+            # If the content is NSFW, send the image as a spoiler
+            if nsfw:
+                await context.send(f"|| {image_url} ||")
+                return
+
             embed = Embed(
                 title=tag.capitalize(),
                 description=image_url,
@@ -170,7 +178,7 @@ class Party(commands.Cog, name='party'):
             )
 
         # Send the embed
-        await context.send(embed=embed)
+        await send_embed(context, embed)
 
 async def setup(bot) -> None:
     await bot.add_cog(Party(bot))
