@@ -15,21 +15,33 @@ class Bazaar():
         self.data = {}
         self.fetch_data.start()
 
-    def fetch_data_once(self):
+    @tasks.loop(hours=1)
+    async def fetch_data(self):
         response = requests.get('https://volcaronitee.pythonanywhere.com/bazaar')
         if response.status_code == 200:
             self.data = response.json().get('items', {})
         else:
             print('Failed to fetch data from the API')
 
-    @tasks.loop(hours=1)
-    async def fetch_data(self):
-        self.fetch_data_once()
-
     def get_data(self):
         return self.data
 
-bazaar = Bazaar()
+
+class Auction():
+    def __init__(self):
+        self.data = {}
+        self.fetch_data.start()
+
+    @tasks.loop(hours=1)
+    async def fetch_data(self):
+        response = requests.get('https://volcaronitee.pythonanywhere.com/auction')
+        if response.status_code == 200:
+            self.data = response.json().get('items', {})
+        else:
+            print('Failed to fetch data from the API')
+
+    def get_data(self):
+        return self.data
 
 
 class Economy(commands.Cog, name='economy'):
@@ -41,6 +53,8 @@ class Economy(commands.Cog, name='economy'):
         """
 
         self.bot = bot
+        self.bazaar = Bazaar()
+        self.auction = Auction()
     
     @commands.hybrid_command(
         name='farming',
@@ -54,7 +68,7 @@ class Economy(commands.Cog, name='economy'):
         :param fortune: The fortune level of the crops.
         """
 
-        bz = bazaar.get_data()
+        bz = self.bazaar.get_data()
 
         # Crops that we want to check the prices for. Source: https://hypixel-skyblock.fandom.com/wiki/Farming_Fortune
         CROPS = {
@@ -207,7 +221,7 @@ class Economy(commands.Cog, name='economy'):
 
         # Constants
         ACTION_15 = 1.1 * (INFERNO_ACTION_BASE - (tier * INFERNO_ACTION_UPGRADE)) / MAX_INFERNO / 16
-        bz = bazaar.get_data()
+        bz = self.bazaar.get_data()
 
         # Calculate the profit
         gabagool = int(count * 86_400 / (2 * ACTION_15) * bz['CRUDE_GABAGOOL'][1])
@@ -257,7 +271,7 @@ class Economy(commands.Cog, name='economy'):
         :param count: Number of minions. Default is 31.
         """
 
-        bz = bazaar.get_data()
+        bz = self.bazaar.get_data()
 
         def calc_hypergolic(insta: int) -> int:
             """
@@ -312,7 +326,7 @@ class Economy(commands.Cog, name='economy'):
         EYEDROP = 1.3
         ACTION_20 = 1.1 * (INFERNO_ACTION_BASE - (tier * INFERNO_ACTION_UPGRADE)) / MAX_INFERNO / 21
         ACTIONS = count * 86400 / (2 * ACTION_20)
-        bz = bazaar.get_data()
+        bz = self.bazaar.get_data()
 
         # Calculate the drops
         drops = {
@@ -443,7 +457,7 @@ class Economy(commands.Cog, name='economy'):
                 'name': 'Mutant Nether Wart'
             }
         }
-        bz = bazaar.get_data()
+        bz = self.bazaar.get_data()
 
         # Create the embed.
         embed = discord.Embed(
