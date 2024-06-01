@@ -160,9 +160,18 @@ class Economy(commands.Cog, name='economy'):
         )
 
         # Track best crop
-        best_crop = 'MUTANT_NETHER_STALK'
-        best_profit = 17_254_080
-        best_value = ''
+        best_npc = {
+            'value': 0,
+            'name': ''
+        }
+        best_order = {
+            'value': 0,
+            'name': ''
+        }
+        best_insta = {
+            'value': 0,
+            'name': ''
+        }
 
         # Add the fields to the embed.
         for crop_id in CROPS.keys():
@@ -184,7 +193,7 @@ class Economy(commands.Cog, name='economy'):
                 insta_calc += int(seed_isnta / 25_600 * seed_rate)
 
             # Add the field to the embed
-            value_msg = f'NPC: {npc_calc:,}\nOrder: {order_calc:,}\nInstant: {insta_calc:,}'
+            value_msg = f'NPC: {npc_calc:,}\nOrder: {order_calc:,}\nInsta: {insta_calc:,}'
             embed.add_field(
                 name=name,
                 value=value_msg,
@@ -192,15 +201,20 @@ class Economy(commands.Cog, name='economy'):
             )
             
             # Track best crop
-            if insta_calc > best_profit or order_calc > best_profit or npc_calc == best_profit:
-                best_crop = name
-                best_profit = max(insta_calc, order_calc)
-                best_value = value_msg
+            if npc_calc > best_npc['value']:
+                best_npc['value'] = npc_calc
+                best_npc['name'] = name
+            if order_calc > best_order['value']:
+                best_order['value'] = order_calc
+                best_order['name'] = name
+            if insta_calc > best_insta['value']:
+                best_insta['value'] = insta_calc
+                best_insta['name'] = name
         
         # Add best crop and send the embed
         embed.add_field(
-            name=f'{best_crop} [Best]',
-            value=best_value,
+            name=f'Best Crops',
+            value=f'NPC: {best_npc["name"]}\nOrder: {best_order["name"]}\nInsta: {best_insta["name"]}',
             inline=True
         )
         
@@ -471,11 +485,11 @@ class Economy(commands.Cog, name='economy'):
             count, icon, name = CROPS[crop_id].values()
             prices = bz.get(crop_id, [0, 0])
             order = int(prices[0] * count)
-            instant = int(prices[1] * count)
+            insta = int(prices[1] * count)
 
             embed.add_field(
                 name=icon + ' ' + name,
-                value=f'Order: {order:,}\nInstant: {instant:,}',
+                value=f'Order: {order:,}\nInsta: {insta:,}',
                 inline=True
             )
         
