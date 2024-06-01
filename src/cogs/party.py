@@ -141,17 +141,6 @@ class Party(commands.Cog, name='party'):
             )
             await context.send(embed=embed)
             return
-
-        # Check if the channel is NSFW
-        nsfw = sfw == 'nsfw'
-        if nsfw and not context.channel.is_nsfw():
-                embed = Embed(
-                    title="NSFW Content",
-                    description="Cannot send NSFW content in a non-NSFW channel.",
-                    color=Color.red()
-                )
-                await context.send(embed=embed)
-                return
         
         # Fetch image from API
         response = requests.get(f'https://api.waifu.pics/{sfw}/{tag}')
@@ -160,8 +149,8 @@ class Party(commands.Cog, name='party'):
             image_url = data['url']
 
             # If the content is NSFW, send the image as a spoiler
-            if nsfw:
-                await context.send(f"|| {image_url} ||")
+            if sfw == 'nsfw':
+                await context.send(f"|| {image_url} ||", ephemeral=True)
                 return
 
             embed = Embed(
