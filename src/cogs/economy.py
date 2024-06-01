@@ -480,9 +480,10 @@ class Economy(commands.Cog, name='economy'):
             )
         
         # Add space helmet and footer to the embed.
+        space_helmet = self.auction.get_data().get('DCTR_SPACE_HELM', {})
         embed.add_field(
             name = '<:space_helmet:1244479304813907989> Space Helmet',
-            value = 'placeholder',
+            value = f"BIN: {space_helmet.get('lbin', 0):,}",
             inline=True
         )
 
